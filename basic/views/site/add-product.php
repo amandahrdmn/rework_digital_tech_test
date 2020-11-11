@@ -23,16 +23,18 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <?php $form = ActiveForm::begin(['id' => 'add-product-form']); ?>
 
-            <?= $form->field($model, 'productName')->textInput(['autofocus' => true]) ?>
+            <?= $form->field($model, 'productName')->textInput(['autofocus' => true,
+                'id' => 'nameField'
+            ]) ?>
 
             <?= $form->field($model, 'price')->textInput(['type' => 'text',
                 'maxlength' => 13,
-                'id' => 'priceField',
+                'id' => 'priceField'
             ])?>
 
             <?= $form->field($model, 'quantity')->textInput(['type' => 'text',
                 'maxlength' => 11,
-                'id' => 'quantityField',
+                'id' => 'quantityField'
             ]) ?>
 
             <?= $form->field($model, 'categories')->checkboxList([
