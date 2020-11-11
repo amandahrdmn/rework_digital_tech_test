@@ -2,7 +2,7 @@
 
 namespace app\controllers;
 
-use app\models\AddProductForm;
+use app\models\ProductEntity;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -138,7 +138,7 @@ class SiteController extends Controller
             return $this->goHome();
         }
 
-        $model = new AddProductForm();
+        $model = new ProductEntity();
 
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
 

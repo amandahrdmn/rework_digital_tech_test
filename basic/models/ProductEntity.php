@@ -8,7 +8,7 @@ use yii\base\Model;
 /**
  * AddProductForm is the model behind the add product form.
  */
-class AddProductForm extends Model
+class ProductEntity extends Model
 {
     public $productName;
     public $price;
