@@ -134,10 +134,6 @@ class SiteController extends Controller
      */
     public function actionAddProduct()
     {
-        if (Yii::$app->user->isGuest) {
-            return $this->goHome();
-        }
-
         $model = new ProductEntity();
 
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
