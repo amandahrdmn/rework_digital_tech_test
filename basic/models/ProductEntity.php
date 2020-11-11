@@ -23,6 +23,8 @@ class ProductEntity extends Model
         return [
             // name, email, subject and body are required
             [['productName', 'price', 'quantity', 'categories'], 'required'],
+            [['productName', 'price', 'quantity', 'categories'], 'trim'],
+
             ['productName', 'match', 'pattern'=>'/^[a-zA-Z0-9]{1,255}$/'],
             ['price', 'match', 'pattern'=>'/^[0-9]{1,12}(\.[0-9]{0,4})?$/'],
             ['quantity', 'integer', 'min' => 0],
