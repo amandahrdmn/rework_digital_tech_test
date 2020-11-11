@@ -127,3 +127,8 @@ a.desc:after {
 #quantityField {
     max-width: 150px;
 }
+
+.checkbox {
+    display: inline-block;
+    padding-right: 20px;
+}
