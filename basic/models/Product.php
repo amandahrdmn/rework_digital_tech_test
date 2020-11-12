@@ -47,7 +47,7 @@ class Product extends ActiveRecord
     }
 
     /**
-     * Gets the product id from the database based on its name
+     * Gets product from the database based on its name
      *
      * @return ActiveRecord $product with its id only or nothing if it does not exist.
      */

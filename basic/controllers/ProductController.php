@@ -14,7 +14,7 @@ use yii\web\Response;
 class ProductController extends Controller
 {
     /*
-     * specifies access controls for controller actions
+     * Specifies access controls for controller actions
      */
     public function accessRules()
     {
@@ -33,13 +33,12 @@ class ProductController extends Controller
     /**
      * Displays add product page.
      *
-     * @throws $error if product addition to database is not successful
      * @return Response|string
      */
     public function actionAddProduct()
     {
         if(Yii::$app->user->isGuest || Yii::$app->user->identity->getAuthKey() !== 'test100key') {
-            return $this->goHome();
+            $this->goHome();
         }
 
         $message = '';
@@ -90,11 +89,11 @@ class ProductController extends Controller
      *
      * @throws HttpException
      *      status 400: if the entries are invalid, product is already in database,
-     *      or a category is not in the database
+     *                  or a category is not in the database
      *
      *      status 500: if the transaction did not succeed
      *
-     * @return bool true/false if the transaction succeeded
+     * @return bool true if the transaction succeeded
      */
     private function addProduct($product, $categories)
     {

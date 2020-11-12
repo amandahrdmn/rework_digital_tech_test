@@ -24,7 +24,7 @@ class Category extends ActiveRecord
     }
 
     /**
-     * gets the list of all non-deleted categories from the database
+     * Gets a list of all non-deleted categories from the database
      *
      * @return array associative array of categoryId => categoryName.
      */
@@ -41,7 +41,7 @@ class Category extends ActiveRecord
     }
 
     /*
-     * defines the category side of the category:product many:many relationship
+     * Defines the category side of the category:product many:many relationship
      */
     public function getProducts()
     {
@@ -49,7 +49,7 @@ class Category extends ActiveRecord
     }
 
     /**
-     * Get category from the database via its name
+     * Gets category from the database based on its name
      *
      * @return ActiveRecord $category with its id only or nothing if it does not exist.
      */

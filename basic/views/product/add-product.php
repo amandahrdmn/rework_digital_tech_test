@@ -3,7 +3,8 @@
 /* @var $this yii\web\View */
 /* @var $form yii\bootstrap\ActiveForm */
 /* @var $product app\models\Product */
-/* @var $categories app\models\Category array*/
+/* @var $categoryList app\models\CategoryList array*/
+/* @var string $message sent from the ProductController; contents dependent on dynamic errors*/
 
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
@@ -20,7 +21,7 @@ $this->params['breadcrumbs'][] = $this->title;
         This is the form for adding a product. Please note that you cannot add previously added products.
     </p>
 
-    <?php if($message !== '' && isset($code)): ?>
+    <?php if($message !== ''): ?>
             <div class='alert alert-danger'>
                 <?php echo nl2br(Html::encode($message)) ?>
             </div>
@@ -39,7 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <?= $form->field($product, 'price')
                 ->textInput(['type' => 'text',
-                    'maxlength' => 13,
+                    'maxlength' => 16,
                     'id' => 'priceField'
                 ])
             ?>
@@ -53,16 +54,15 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <?= $form->field($categoryList, 'categoryNames')
                 ->checkboxList(
-                    Category::getCategoryList()
-                    ,
+                    Category::getCategoryList(),
                     ['item' => function($index, $label, $name, $checked, $value) {
                         return "<div class='checkbox'>
-                                                        <label>
-                                                            <input type='checkbox' {$checked}
-                                                                    name='{$name}'
-                                                                    value='{$label}'>{$label}"
-                            ."</label>
-                                                    </div>";
+                                    <label>
+                                        <input type='checkbox' {$checked}
+                                                name='{$name}'
+                                                value='{$label}'>{$label}"
+                                    ."</label>
+                                </div>";
                     }]
                 );
 
