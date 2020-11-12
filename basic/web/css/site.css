@@ -113,3 +113,22 @@ a.desc:after {
 .nav > li > form > button.logout:focus {
     outline: none;
 }
+
+/* styling of add product form */
+
+#nameField {
+    max-width: 500px;
+}
+
+#priceField {
+    max-width: 200px;
+}
+
+#quantityField {
+    max-width: 150px;
+}
+
+.checkbox {
+    display: inline-block;
+    padding-right: 20px;
+}
