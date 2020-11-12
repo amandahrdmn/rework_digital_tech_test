@@ -42,21 +42,20 @@ class ProductController extends Controller
             return $this->goHome();
         }
         $product = new Product();
-        $categories = new CategoryList();
+        $categoryNames = new CategoryList();
 
-        if ($product->load(Yii::$app->request->post()) && $product->validate()
-            && $categories->load(Yii::$app->request->post()) && $categories->validate()) {
+        if ($product->load(Yii::$app->request->post())
+            && $categoryNames->load(Yii::$app->request->post()) && $categoryNames->validate()) {
 
-            foreach($categories->categoryIds as $categoryId) {
-                $productCategory = new Category();
+            foreach($categoryNames->categoryNames as $categoryName) {
+                $category = new Category();
+                $category->name = $categoryName;
 
-                $productCategory->id = $categoryId;
-
-                $productCategories[] = $productCategory;
+                $categories[] = $category;
             }
 
             try {
-                $this->addProduct($product, $productCategories);
+                $this->addProduct($product, $categories);
             } catch (\Throwable $e) {
                 throw $e;
             }
@@ -64,7 +63,7 @@ class ProductController extends Controller
             return $this->refresh();
         } else {
 
-            return $this->render('add-product', ['product' => $product, 'categories' => $categories]);
+            return $this->render('add-product', ['product' => $product, 'categoryNames' => $categoryNames]);
         }
     }
 
@@ -73,7 +72,7 @@ class ProductController extends Controller
      * products to their categories.
      *
      * @param Product $product the populated product to be added to the database.
-     * @param Category $productCategories selected categories of the product to be added to the database.
+     * @param Category $categories selected categories of the product to be added to the database.
      *
      * @throws HttpException
      *      status 400: if the entries are invalid, product is already in database,
@@ -83,18 +82,17 @@ class ProductController extends Controller
      *
      * @return bool true/false if the transaction succeeded
      */
-    private function addProduct($product, $productCategories)
+    private function addProduct($product, $categories)
     {
         if(!$product->validate()) {
             throw new HttpException(400, 'Invalid product entries.');
-        } elseif($product->getProductIdByName()) {
+        } elseif($product->getProductByName()) {
             throw new HttpException(400,'Product already exists.');
         }
 
-        foreach($productCategories as $category) {
-            $valid = $category->validate();
-            if ($valid) {
-                if(!$category->checkCategoryExistsById()) {
+        foreach($categories as $category) {
+            if ($category->validate()) {
+                if(!$category->getCategoryByName()) {
                     throw new HttpException(400, "Category $category->id does not exist.");
                 }
                 continue;
@@ -111,12 +109,13 @@ class ProductController extends Controller
                 ->insert('product', $product)
                 ->execute();
 
-            $productId = $product->getProductIdByName()->id;
+            $productId = $product->getProductByName()->id;
 
-            foreach($productCategories as $category) {
+            foreach($categories as $category) {
+                $categoryId=$category->getCategoryByName()->id;
                 $db->createCommand()
                     ->insert('product_category', [
-                        'categoryId' => $category->id,
+                        'categoryId' => $categoryId,
                         'productId' => $productId
                     ])
                     ->execute();

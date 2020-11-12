@@ -45,14 +45,27 @@ $this->params['breadcrumbs'][] = $this->title;
                 ])
             ?>
 
-            <?= $form->field($categories, 'categoryIds')
-                ->checkboxList(Category::getCategoryList());
+            <?= $form->field($categoryNames, 'categoryNames')
+                ->checkboxList(
+                        Category::getCategoryList(),
+                        ['item' => function($index, $label, $name, $checked, $value) {
+                                            return "<div class='checkbox'>
+                                                        <label>
+                                                            <input type='checkbox' {$checked} 
+                                                                    name='{$name}' 
+                                                                    value='{$label}'
+                                                                    tabindex='3'>{$label}"
+                                                            ."</label>
+                                                    </div>";
+                                        }]
+                );
+
             ?>
 
             <div class="form-group">
                 <?= Html::submitButton('Submit', [
-                        'class' => 'btn btn-primary',
-                        'name' => 'add-product-button'
+                    'class' => 'btn btn-primary',
+                    'name' => 'add-product-button'
                 ]) ?>
                 <a class="btn btn-danger" href="../site/index.php">Back</a>
             </div>

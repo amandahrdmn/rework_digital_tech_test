@@ -43,7 +43,7 @@ class Product extends ActiveRecord
      */
     public function getCategories()
     {
-        return $this->hasMany(Category::class, ['product_id' => 'id']);
+        return $this->hasMany(Category::class, ['id' => 'id']);
     }
 
     /**
@@ -51,7 +51,7 @@ class Product extends ActiveRecord
      *
      * @return ActiveRecord $product with its id only or nothing if it does not exist.
      */
-    public function getProductIdByName()
+    public function getProductByName()
     {
         return $this::find()
             ->select('id')

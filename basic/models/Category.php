@@ -4,13 +4,11 @@
 namespace app\models;
 
 use app\components\validators\NameValidator;
-use app\components\validators\PositiveIntegerValidator;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
 class Category extends ActiveRecord
 {
-    public $id;
     public $name;
 
     /**
@@ -19,10 +17,9 @@ class Category extends ActiveRecord
     public function rules()
     {
         return [
-            ['id', 'required'],
+            ['name', 'required'],
 
             ['name', NameValidator::class],
-            ['id', PositiveIntegerValidator::class],
         ];
     }
 
@@ -48,19 +45,19 @@ class Category extends ActiveRecord
      */
     public function getProducts()
     {
-        return $this->hasMany(Product::class, ['category_id' => 'id']);
+        return $this->hasMany(Product::class, ['id' => 'id']);
     }
 
     /**
-     * Checks if the category is already in the database
+     * Get category from the database via its name
      *
      * @return ActiveRecord $category with its id only or nothing if it does not exist.
      */
-    public function checkCategoryExistsById()
+    public function getCategoryByName()
     {
         return $this::find()
             ->select('id')
-            ->where(['id' => $this->id])
+            ->where(['name' => $this->name])
             ->one();
     }
 }
