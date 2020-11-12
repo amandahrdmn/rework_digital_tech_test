@@ -114,6 +114,13 @@ a.desc:after {
     outline: none;
 }
 
+/* styling of homepage */
+
+.page_explanation {
+    padding-top: 30px;
+    padding-bottom: 30px;
+}
+
 /* styling of add product form */
 
 #nameField {

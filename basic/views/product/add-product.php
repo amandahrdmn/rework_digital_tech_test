@@ -17,7 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1>
         <?= Html::encode($this->title); ?></h1>
 
-    <p>
+    <p class="page_explanation">
         This is the form for adding a product. Please note that you cannot add previously added products.
     </p>
 
