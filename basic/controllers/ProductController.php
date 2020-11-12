@@ -13,6 +13,23 @@ use yii\web\Response;
 
 class ProductController extends Controller
 {
+    /*
+     * specifies access controls for controller actions
+     */
+    public function accessRules()
+    {
+        return [
+            ['deny',
+                'actions'=>array('add-product'),
+                'users'=>array('*'),
+            ],
+            ['allow',
+                'actions'=>array('add-product'),
+                'roles'=>array('admin'),
+            ]
+        ];
+    }
+
     /**
      * Displays add product page.
      *
@@ -21,11 +38,14 @@ class ProductController extends Controller
      */
     public function actionAddProduct()
     {
+        if(Yii::$app->user->isGuest || Yii::$app->user->identity->getAuthKey() !== 'test100key') {
+            return $this->goHome();
+        }
         $product = new Product();
         $categories = new CategoryList();
 
         if ($product->load(Yii::$app->request->post()) && $product->validate()
-        && $categories->load(Yii::$app->request->post()) && $categories->validate()) {
+            && $categories->load(Yii::$app->request->post()) && $categories->validate()) {
 
             foreach($categories->categoryIds as $categoryId) {
                 $productCategory = new Category();
@@ -63,7 +83,7 @@ class ProductController extends Controller
      *
      * @return bool true/false if the transaction succeeded
      */
-    public function addProduct($product, $productCategories)
+    private function addProduct($product, $productCategories)
     {
         if(!$product->validate()) {
             throw new HttpException(400, 'Invalid product entries.');
@@ -96,9 +116,9 @@ class ProductController extends Controller
             foreach($productCategories as $category) {
                 $db->createCommand()
                     ->insert('product_category', [
-                                                'categoryId' => $category->id,
-                                                'productId' => $productId
-                                            ])
+                        'categoryId' => $category->id,
+                        'productId' => $productId
+                    ])
                     ->execute();
             }
 
