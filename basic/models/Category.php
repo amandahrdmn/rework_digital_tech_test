@@ -3,7 +3,6 @@
 
 namespace app\models;
 
-use app\components\validators\NameValidator;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
@@ -19,7 +18,8 @@ class Category extends ActiveRecord
         return [
             ['name', 'required'],
 
-            ['name', NameValidator::class],
+            ['name', 'match', 'pattern' => '/^[a-zA-Z0-9]{1,255}$/',
+                'message' => 'Invalid category name.'],
         ];
     }
 

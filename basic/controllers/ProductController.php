@@ -41,13 +41,17 @@ class ProductController extends Controller
         if(Yii::$app->user->isGuest || Yii::$app->user->identity->getAuthKey() !== 'test100key') {
             return $this->goHome();
         }
+
+        $message = '';
+        $code = NULL;
+
         $product = new Product();
-        $categoryNames = new CategoryList();
+        $categoryList = new CategoryList();
 
-        if ($product->load(Yii::$app->request->post())
-            && $categoryNames->load(Yii::$app->request->post()) && $categoryNames->validate()) {
+        if ($product->load(Yii::$app->request->post()) && $product->validate()
+            && $categoryList->load(Yii::$app->request->post()) && $categoryList->validate()) {
 
-            foreach($categoryNames->categoryNames as $categoryName) {
+            foreach($categoryList->categoryNames as $categoryName) {
                 $category = new Category();
                 $category->name = $categoryName;
 
@@ -56,15 +60,25 @@ class ProductController extends Controller
 
             try {
                 $this->addProduct($product, $categories);
+                $this->refresh();
+
             } catch (\Throwable $e) {
-                throw $e;
+                $message = $e->getMessage();
+                $code = $e->getCode();
             }
-
-            return $this->refresh();
         } else {
-
-            return $this->render('add-product', ['product' => $product, 'categoryNames' => $categoryNames]);
+            foreach($product->errors as $error) {
+                $message .= $error[0] . "\n";
+            };
+            $code = 400;
         }
+
+        return $this->render('add-product', [
+            'product' => $product,
+            'categoryList' => $categoryList,
+            'message' => $message,
+            'code' => $code
+        ]);
     }
 
     /**
@@ -84,9 +98,7 @@ class ProductController extends Controller
      */
     private function addProduct($product, $categories)
     {
-        if(!$product->validate()) {
-            throw new HttpException(400, 'Invalid product entries.');
-        } elseif($product->getProductByName()) {
+        if($product->getProductByName()) {
             throw new HttpException(400,'Product already exists.');
         }
 

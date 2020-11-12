@@ -3,9 +3,6 @@
 
 namespace app\models;
 
-use app\components\validators\NameValidator;
-use app\components\validators\PositiveIntegerValidator;
-use app\components\validators\PriceValidator;
 use yii\db\ActiveRecord;
 
 class Product extends ActiveRecord
@@ -32,9 +29,12 @@ class Product extends ActiveRecord
         return [
             [['name', 'price', 'quantity'], 'required'],
 
-            ['name', NameValidator::class],
-            ['price', PriceValidator::class],
-            ['quantity', PositiveIntegerValidator::class],
+            ['name', 'match', 'pattern' => '/^[a-zA-Z0-9]{1,255}$/',
+                'message' => 'Invalid product name.'],
+            ['price', 'match', 'pattern' => '/^[0-9]{1,12}(\.[0-9]{0,4})?$/',
+                'message' => 'Invalid product price.'],
+            ['quantity', 'match', 'pattern' => '/^[0-9]{1,11}$/',
+                'message' => 'Invalid product quantity.'],
         ];
     }
 

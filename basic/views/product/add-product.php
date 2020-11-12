@@ -20,6 +20,12 @@ $this->params['breadcrumbs'][] = $this->title;
         This is the form for adding a product. Please note that you cannot add previously added products.
     </p>
 
+    <?php if($message !== '' && isset($code)): ?>
+            <div class='alert alert-danger'>
+                <?php echo nl2br(Html::encode($message)) ?>
+            </div>
+    <?php endif; ?>
+
     <div class="row">
         <div class="col-xs-12">
 
@@ -45,19 +51,19 @@ $this->params['breadcrumbs'][] = $this->title;
                 ])
             ?>
 
-            <?= $form->field($categoryNames, 'categoryNames')
+            <?= $form->field($categoryList, 'categoryNames')
                 ->checkboxList(
-                        Category::getCategoryList(),
-                        ['item' => function($index, $label, $name, $checked, $value) {
-                                            return "<div class='checkbox'>
+                    Category::getCategoryList()
+                    ,
+                    ['item' => function($index, $label, $name, $checked, $value) {
+                        return "<div class='checkbox'>
                                                         <label>
-                                                            <input type='checkbox' {$checked} 
-                                                                    name='{$name}' 
-                                                                    value='{$label}'
-                                                                    tabindex='3'>{$label}"
-                                                            ."</label>
+                                                            <input type='checkbox' {$checked}
+                                                                    name='{$name}'
+                                                                    value='{$label}'>{$label}"
+                            ."</label>
                                                     </div>";
-                                        }]
+                    }]
                 );
 
             ?>
@@ -67,7 +73,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'class' => 'btn btn-primary',
                     'name' => 'add-product-button'
                 ]) ?>
-                <a class="btn btn-danger" href="../site/index.php">Back</a>
+                <a class="btn btn-danger" href="../index.php">Back</a>
             </div>
 
             <?php ActiveForm::end(); ?>
