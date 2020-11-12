@@ -4,7 +4,7 @@
 namespace app\controllers;
 
 use Yii;
-use app\models\AddProductForm;
+use app\models\CategoryList;
 use app\models\Category;
 use app\models\Product;
 use yii\web\Controller;
@@ -21,18 +21,13 @@ class ProductController extends Controller
      */
     public function actionAddProduct()
     {
-        $model = new AddProductForm();
+        $product = new Product();
+        $categories = new CategoryList();
 
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+        if ($product->load(Yii::$app->request->post()) && $product->validate()
+        && $categories->load(Yii::$app->request->post()) && $categories->validate()) {
 
-            $product = new Product();
-            $product->attributes = [
-                'name' => $model->name,
-                'price' => $model->price,
-                'quantity' => $model->quantity
-            ];
-
-            foreach($model->categoryIds as $categoryId) {
+            foreach($categories->categoryIds as $categoryId) {
                 $productCategory = new Category();
 
                 $productCategory->id = $categoryId;
@@ -49,7 +44,7 @@ class ProductController extends Controller
             return $this->refresh();
         } else {
 
-            return $this->render('add-product', ['model' => $model]);
+            return $this->render('add-product', ['product' => $product, 'categories' => $categories]);
         }
     }
 
@@ -80,7 +75,7 @@ class ProductController extends Controller
             $valid = $category->validate();
             if ($valid) {
                 if(!$category->checkCategoryExistsById()) {
-                    throw new HttpException(400, 'Category does not exist.');
+                    throw new HttpException(400, "Category $category->id does not exist.");
                 }
                 continue;
             }
@@ -100,7 +95,7 @@ class ProductController extends Controller
 
             foreach($productCategories as $category) {
                 $db->createCommand()
-                    ->insert('productCategory', [
+                    ->insert('product_category', [
                                                 'categoryId' => $category->id,
                                                 'productId' => $productId
                                             ])

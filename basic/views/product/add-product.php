@@ -2,7 +2,8 @@
 
 /* @var $this yii\web\View */
 /* @var $form yii\bootstrap\ActiveForm */
-/* @var $model app\models\AddProductForm */
+/* @var $product app\models\Product */
+/* @var $categories app\models\Category array*/
 
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
@@ -24,27 +25,27 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <?php $form = ActiveForm::begin(['id' => 'add-product-form']); ?>
 
-            <?= $form->field($model, 'name')
+            <?= $form->field($product, 'name')
                 ->textInput(['autofocus' => true,
                     'id' => 'nameField'
                 ])
             ?>
 
-            <?= $form->field($model, 'price')
+            <?= $form->field($product, 'price')
                 ->textInput(['type' => 'text',
                     'maxlength' => 13,
                     'id' => 'priceField'
                 ])
             ?>
 
-            <?= $form->field($model, 'quantity')
+            <?= $form->field($product, 'quantity')
                 ->textInput(['type' => 'text',
                     'maxlength' => 11,
                     'id' => 'quantityField'
                 ])
             ?>
 
-            <?= $form->field($model, 'categoryIds')
+            <?= $form->field($categories, 'categoryIds')
                 ->checkboxList(Category::getCategoryList());
             ?>
 

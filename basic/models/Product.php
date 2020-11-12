@@ -38,6 +38,14 @@ class Product extends ActiveRecord
         ];
     }
 
+    /*
+     * defines the product side of the category:product many:many relationship
+     */
+    public function getCategories()
+    {
+        return $this->hasMany(Category::class, ['product_id' => 'id']);
+    }
+
     /**
      * Gets the product id from the database based on its name
      *

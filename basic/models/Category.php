@@ -12,7 +12,6 @@ class Category extends ActiveRecord
 {
     public $id;
     public $name;
-    public $productIds;
 
     /**
      * @return array the validation rules.
@@ -24,7 +23,6 @@ class Category extends ActiveRecord
 
             ['name', NameValidator::class],
             ['id', PositiveIntegerValidator::class],
-            ['productIds', 'each', 'rule' => PositiveIntegerValidator::class]
         ];
     }
 
@@ -43,6 +41,14 @@ class Category extends ActiveRecord
             ->all();
 
         return ArrayHelper::map($categoryList, 'id', 'name');
+    }
+
+    /*
+     * defines the category side of the category:product many:many relationship
+     */
+    public function getProducts()
+    {
+        return $this->hasMany(Product::class, ['category_id' => 'id']);
     }
 
     /**

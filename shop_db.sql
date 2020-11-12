@@ -7,7 +7,7 @@
 #
 # Host: localhost (MySQL 8.0.22)
 # Database: shop_db
-# Generation Time: 2020-11-11 22:46:14 +0000
+# Generation Time: 2020-11-12 11:03:43 +0000
 # ************************************************************
 
 
@@ -77,26 +77,26 @@ VALUES
 UNLOCK TABLES;
 
 
-# Dump of table productCategory
+# Dump of table product_category
 # ------------------------------------------------------------
 
-DROP TABLE IF EXISTS `productCategory`;
+DROP TABLE IF EXISTS `product_category`;
 
-CREATE TABLE `productCategory` (
+CREATE TABLE `product_category` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `productId` int unsigned NOT NULL,
   `categoryId` int unsigned NOT NULL,
   PRIMARY KEY (`id`),
   KEY `productId` (`productId`),
   KEY `categoryId` (`categoryId`),
-  CONSTRAINT `productcategory_ibfk_1` FOREIGN KEY (`productId`) REFERENCES `product` (`id`),
-  CONSTRAINT `productcategory_ibfk_2` FOREIGN KEY (`categoryId`) REFERENCES `category` (`id`)
+  CONSTRAINT `product_category_ibfk_1` FOREIGN KEY (`productId`) REFERENCES `product` (`id`),
+  CONSTRAINT `product_category_ibfk_2` FOREIGN KEY (`categoryId`) REFERENCES `category` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-LOCK TABLES `productCategory` WRITE;
-/*!40000 ALTER TABLE `productCategory` DISABLE KEYS */;
+LOCK TABLES `product_category` WRITE;
+/*!40000 ALTER TABLE `product_category` DISABLE KEYS */;
 
-INSERT INTO `productCategory` (`id`, `productId`, `categoryId`)
+INSERT INTO `product_category` (`id`, `productId`, `categoryId`)
 VALUES
 	(1,3,1),
 	(2,3,2),
@@ -107,7 +107,7 @@ VALUES
 	(15,5,2),
 	(16,5,3);
 
-/*!40000 ALTER TABLE `productCategory` ENABLE KEYS */;
+/*!40000 ALTER TABLE `product_category` ENABLE KEYS */;
 UNLOCK TABLES;
 
 
