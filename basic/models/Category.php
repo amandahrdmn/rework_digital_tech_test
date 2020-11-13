@@ -76,7 +76,7 @@ class Category extends ActiveRecord
     public function checkCategoryExistsByName()
     {
         $category = $this::find()
-            ->select(['id'])
+            ->select('id')
             ->where(['name' => $this->name])
             ->one();
         if($category !== NULL) {

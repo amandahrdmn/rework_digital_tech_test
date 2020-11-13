@@ -71,7 +71,7 @@ class Product extends ActiveRecord
     public function checkProductExistsByName()
     {
         $category = $this::find()
-            ->select(['id'])
+            ->select('id')
             ->where(['name' => $this->name])
             ->one();
         if($category !== NULL) {
