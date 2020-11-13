@@ -7,6 +7,7 @@ use Yii;
 use app\models\CategoryList;
 use app\models\Category;
 use app\models\Product;
+use yii\db\ActiveRecord;
 use yii\web\Controller;
 use yii\web\HttpException;
 use yii\web\Response;
@@ -33,6 +34,10 @@ class ProductController extends Controller
     /**
      * Displays add product page.
      *
+     * @throw HttpException:
+     *      status 400 if validation of models is incorrect
+     *      status 500 if there is a error when adding the product to the database
+     *
      * @return Response|string
      */
     public function actionAddProduct()
@@ -47,29 +52,42 @@ class ProductController extends Controller
         $product = new Product();
         $categoryList = new CategoryList();
 
-        if ($product->load(Yii::$app->request->post()) && $product->validate()
-            && $categoryList->load(Yii::$app->request->post()) && $categoryList->validate()) {
+        try {
+            if ($product->load(Yii::$app->request->post())
+                && $product->validate()
+                && $categoryList->load(Yii::$app->request->post())
+                && $categoryList->validate()) {
 
-            foreach($categoryList->categoryNames as $categoryName) {
-                $category = new Category();
-                $category->name = $categoryName;
+                foreach ($categoryList->categoryNames as $categoryName) {
+                    $category = Category::getCategoryByName($categoryName);
 
-                $categories[] = $category;
-            }
+                    if ($category !== NULL) {
+                        if ($category->validate()) {
+                            $categories[] = $category;
 
-            try {
-                $this->addProduct($product, $categories);
+                            continue;
+                        }
+                        $messageString = $this->concatErrorMessages($category);
+
+                        throw new HttpException(400, $messageString);
+                    }
+
+                    throw new HttpException(
+                        400,
+                        "Category $categoryName does not exist in database.");
+                }
+
+                $this->addProducttoDB($product, $categories);
                 $this->refresh();
-
-            } catch (\Throwable $e) {
-                $message = $e->getMessage();
-                $code = $e->getCode();
             }
-        } else {
-            foreach($product->errors as $error) {
-                $message .= $error[0] . "\n";
-            };
-            $code = 400;
+
+            $message = $this->concatErrorMessages($product);
+
+            throw new HttpException(400, $message);
+
+        } catch (\Throwable $e) {
+            $message = $e->getMessage();
+            $code = $e->getCode();
         }
 
         return $this->render('add-product', [
@@ -87,49 +105,22 @@ class ProductController extends Controller
      * @param Product $product the populated product to be added to the database.
      * @param Category $categories selected categories of the product to be added to the database.
      *
-     * @throws HttpException
-     *      status 400: if the entries are invalid, product is already in database,
-     *                  or a category is not in the database
-     *
-     *      status 500: if the transaction did not succeed
+     * @throws HttpException status 500: if the transaction did not succeed
      *
      * @return bool true if the transaction succeeded
      */
-    private function addProduct($product, $categories)
+    private function addProducttoDB($product, $categories)
     {
-        if($product->getProductByName()) {
-            throw new HttpException(400,'Product already exists.');
-        }
-
-        foreach($categories as $category) {
-            if ($category->validate()) {
-                if(!$category->getCategoryByName()) {
-                    throw new HttpException(400, "Category $category->id does not exist.");
-                }
-                continue;
-            }
-
-            throw new HttpException(400, "Category $category->id is invalid.");
-        }
-
         $db = Product::getDb();
         $transaction = $db->beginTransaction();
 
         try {
-            $db->createCommand()
-                ->insert('product', $product)
-                ->execute();
+            $product->save();
 
-            $productId = $product->getProductByName()->id;
-
+            $productId = Product::getProductIdByName($product->name);
+            
             foreach($categories as $category) {
-                $categoryId=$category->getCategoryByName()->id;
-                $db->createCommand()
-                    ->insert('product_category', [
-                        'categoryId' => $categoryId,
-                        'productId' => $productId
-                    ])
-                    ->execute();
+                $category->link('products', $productId);
             }
 
             $transaction->commit();
@@ -140,5 +131,21 @@ class ProductController extends Controller
         }
 
         return true;
+    }
+
+    /**
+     * Takes an ActiveRecord and converts any of its error messages to a single string.
+     *
+     * @param ActiveRecord $model
+     *
+     * @return string $message
+     */
+    private function concatErrorMessages($model) {
+        $message = '';
+        foreach($model->errors as $error) {
+            $message .= $error[0] . "\n";
+        };
+
+        return $message;
     }
 }

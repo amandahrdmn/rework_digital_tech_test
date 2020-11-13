@@ -8,8 +8,6 @@ use yii\helpers\ArrayHelper;
 
 class Category extends ActiveRecord
 {
-    public $name;
-
     /**
      * @return array the validation rules.
      */
@@ -20,7 +18,24 @@ class Category extends ActiveRecord
 
             ['name', 'match', 'pattern' => '/^[a-zA-Z0-9]{1,255}$/',
                 'message' => 'Invalid category name.'],
+            ['name', function ($attribute, $params, $validator) {
+                if ($this->checkCategoryExistsByName() === false) {
+                    $this->addError(
+                        $attribute,
+                        "Category $attribute does not exist in database."
+                    );
+                }
+            }]
         ];
+    }
+
+    /**
+     * Defines category side of product-category many-to-many relationship
+     */
+    public function getProducts()
+    {
+        return $this->hasMany(Product::class, ['id' => 'product_id'])
+            ->viaTable('product_category', ['category_id' => 'id']);
     }
 
     /**
@@ -40,24 +55,33 @@ class Category extends ActiveRecord
         return ArrayHelper::map($categoryList, 'id', 'name');
     }
 
-    /*
-     * Defines the category side of the category:product many:many relationship
-     */
-    public function getProducts()
-    {
-        return $this->hasMany(Product::class, ['id' => 'id']);
-    }
-
     /**
      * Gets category from the database based on its name
      *
-     * @return ActiveRecord $category with its id only or nothing if it does not exist.
+     * @return ActiveRecord $category or nothing if it does not exist.
      */
-    public function getCategoryByName()
+    public static function getCategoryByName($name)
     {
-        return $this::find()
+        return Category::find()
+            ->select(['id', 'name'])
+            ->where(['name' => $name])
+            ->one();
+    }
+
+    /**
+     * Checks if category exists in the database based on its name
+     *
+     * @return bool of true/false if it does/not exist.
+     */
+    public function checkCategoryExistsByName()
+    {
+        $category = $this::find()
             ->select('id')
             ->where(['name' => $this->name])
             ->one();
+        if($category !== NULL) {
+            return true;
+        }
+        return false;
     }
 }
