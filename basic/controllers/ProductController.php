@@ -118,9 +118,7 @@ class ProductController extends Controller
             $product->save();
 
             $productId = Product::getProductIdByName($product->name);
-
-            var_dump($productId->isNewRecord);
-
+            
             foreach($categories as $category) {
                 $category->link('products', $productId);
             }
