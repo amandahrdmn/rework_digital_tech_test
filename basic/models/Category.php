@@ -20,6 +20,14 @@ class Category extends ActiveRecord
 
             ['name', 'match', 'pattern' => '/^[a-zA-Z0-9]{1,255}$/',
                 'message' => 'Invalid category name.'],
+            ['name', function ($attribute, $params, $validator) {
+                if ($this->getCategoryByName() === NULL) {
+                    $this->addError(
+                        $attribute,
+                        "Category $attribute does not exist in database."
+                    );
+                }
+            }]
         ];
     }
 

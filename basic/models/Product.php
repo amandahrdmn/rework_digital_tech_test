@@ -7,10 +7,6 @@ use yii\db\ActiveRecord;
 
 class Product extends ActiveRecord
 {
-    public $name;
-    public $price;
-    public $quantity;
-
     /**
      * initialises all Products with a default value of deleted = 0
      */
@@ -35,6 +31,15 @@ class Product extends ActiveRecord
                 'message' => 'Invalid product price.'],
             ['quantity', 'match', 'pattern' => '/^[0-9]{1,11}$/',
                 'message' => 'Invalid product quantity.'],
+            ['name', function ($attribute, $params, $validator) {
+//                var_dump($this->getProductByName());
+//                die;
+                if ($this->getProductByName() !== NULL) {
+                    $this->addError(
+                        $attribute,
+                        'Product already exists in database.');
+                }
+            }]
         ];
     }
 
