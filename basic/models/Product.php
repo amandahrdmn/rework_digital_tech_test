@@ -8,7 +8,7 @@ use yii\db\ActiveRecord;
 class Product extends ActiveRecord
 {
     /**
-     * initialises all Products with a default value of deleted = 0
+     * Initialises all Products with a default value of deleted = 0
      */
     public function init()
     {
@@ -32,9 +32,7 @@ class Product extends ActiveRecord
             ['quantity', 'match', 'pattern' => '/^[0-9]{1,11}$/',
                 'message' => 'Invalid product quantity.'],
             ['name', function ($attribute, $params, $validator) {
-//                var_dump($this->getProductByName());
-//                die;
-                if ($this->getProductByName() !== NULL) {
+                if ($this->checkProductExistsByName() === true) {
                     $this->addError(
                         $attribute,
                         'Product already exists in database.');
@@ -43,24 +41,42 @@ class Product extends ActiveRecord
         ];
     }
 
-    /*
-     * defines the product side of the category:product many:many relationship
+    /**
+     * Defines product side of product-category many-to-many relationship
      */
     public function getCategories()
     {
-        return $this->hasMany(Category::class, ['id' => 'id']);
+        return $this->hasMany(Category::class, ['id' => 'category_id'])
+            ->viaTable('product_category', ['product_id' => 'id']);
     }
 
     /**
      * Gets product from the database based on its name
      *
-     * @return ActiveRecord $product with its id only or nothing if it does not exist.
+     * @return ActiveRecord $product or nothing if it does not exist.
      */
-    public function getProductByName()
+    public static function getProductIdByName($name)
     {
-        return $this::find()
+        return Product::find()
             ->select('id')
+            ->where(['name' => $name])
+            ->one();
+    }
+
+    /**
+     * Checks if product exists in the database based on its name
+     *
+     * @return bool of true/false if it does/not exist.
+     */
+    public function checkProductExistsByName()
+    {
+        $category = $this::find()
+            ->select(['id'])
             ->where(['name' => $this->name])
             ->one();
+        if($category !== NULL) {
+            return true;
+        }
+        return false;
     }
 }

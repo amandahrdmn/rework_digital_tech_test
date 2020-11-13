@@ -59,15 +59,22 @@ class ProductController extends Controller
                 && $categoryList->validate()) {
 
                 foreach ($categoryList->categoryNames as $categoryName) {
-                    $category = new Category();
-                    $category->name = $categoryName;
+                    $category = Category::getCategoryByName($categoryName);
 
-                    if (!$category->validate()) {
+                    if ($category !== NULL) {
+                        if ($category->validate()) {
+                            $categories[] = $category;
+
+                            continue;
+                        }
                         $messageString = $this->concatErrorMessages($category);
+
                         throw new HttpException(400, $messageString);
                     }
 
-                    $categories[] = $category;
+                    throw new HttpException(
+                        400,
+                        "Category $categoryName does not exist in database.");
                 }
 
                 $this->addProducttoDB($product, $categories);
@@ -75,6 +82,7 @@ class ProductController extends Controller
             }
 
             $message = $this->concatErrorMessages($product);
+
             throw new HttpException(400, $message);
 
         } catch (\Throwable $e) {
@@ -107,20 +115,14 @@ class ProductController extends Controller
         $transaction = $db->beginTransaction();
 
         try {
-            $db->createCommand()
-                ->insert('product', $product)
-                ->execute();
+            $product->save();
 
-            $productId = $product->getProductByName()->id;
+            $productId = Product::getProductIdByName($product->name);
+
+            var_dump($productId->isNewRecord);
 
             foreach($categories as $category) {
-                $categoryId=$category->getCategoryByName()->id;
-                $db->createCommand()
-                    ->insert('product_category', [
-                        'categoryId' => $categoryId,
-                        'productId' => $productId
-                    ])
-                    ->execute();
+                $category->link('products', $productId);
             }
 
             $transaction->commit();
